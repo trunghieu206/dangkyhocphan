@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaUI | Hệ thống đăng ký học phần</title>
+    <style>
+        :root {
+            --navy: #102a56;
+            --blue: #1769aa;
+            --blue2: #2785d7;
+            --bg: #f3f6fb;
+            --ink: #1d2939;
+            --muted: #667085;
+            --line: #e5eaf2;
+            --green: #16845b;
+            --red: #c0392b;
+            --amber: #a86608
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--ink)
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 14px;
+            font-weight: 650
+        }
+
+        button:disabled {
+            opacity: .45;
+            cursor: not-allowed
+        }
+
+        .primary {
+            background: var(--blue);
+            color: white
+        }
+
+        .primary:hover {
+            background: #12568f
+        }
+
+        .outline {
+            background: white;
+            border: 1px solid var(--line);
+            color: var(--ink)
+        }
+
+        .danger {
+            background: #fff0ef;
+            color: var(--red)
+        }
+
+        .success {
+            background: #e7f7ef;
+            color: var(--green)
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .small {
+            font-size: 12px
+        }
+
+        .app {
+            min-height: 100vh
+        }
+
+        .topbar {
+            height: 72px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 10
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .crest {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #1e74ba, #102a56);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: -1px
+        }
+
+        .brand strong {
+            display: block;
+            color: var(--navy);
+            font-size: 16px
+        }
+
+        .brand span {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: .7px
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #e1efff;
+            color: var(--blue);
+            display: grid;
+            place-items: center;
+            font-weight: 800
+        }
+
+        .user-meta {
+            text-align: right
+        }
+
+        .user-meta b {
+            font-size: 13px;
+            display: block
+        }
+
+        .user-meta span {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 248px minmax(0, 1fr);
+            min-height: calc(100vh - 72px)
+        }
+
+        aside {
+            background: #fff;
+            border-right: 1px solid var(--line);
+            padding: 24px 14px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            color: #98a2b3;
+            padding: 0 13px;
+            margin: 18px 0 8px
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background: transparent;
+            color: #536174;
+            text-align: left;
+            padding: 12px 13px;
+            margin: 3px 0;
+            font-weight: 600
+        }
+
+        .nav .ico {
+            width: 22px;
+            text-align: center;
+            font-size: 17px
+        }
+
+        .nav.active {
+            background: #eaf3ff;
+            color: var(--blue);
+            box-shadow: inset 3px 0 var(--blue)
+        }
+
+        .side-note {
+            margin: 28px 7px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f5f8fc;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6
+        }
+
+        .main {
+            padding: 30px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto
+        }
+
+        .crumb {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px
+        }
+
+        .page-head h1 {
+            font-size: 26px;
+            margin: 0 0 7px;
+            color: #162b4d
+        }
+
+        .page-head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 9px;
+            border-radius: 99px;
+            background: #eaf3ff;
+            color: #1769aa;
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px
+        }
+
+        .stat,
+        .panel {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            box-shadow: 0 3px 12px #203b6010
+        }
+
+        .stat {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .stat .label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 9px
+        }
+
+        .stat .num {
+            font-size: 26px;
+            font-weight: 800;
+            color: #162b4d
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: #edf5ff;
+            display: grid;
+            place-items: center;
+            font-size: 20px
+        }
+
+        .panel {
+            padding: 21px;
+            margin-bottom: 20px
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 17px
+        }
+
+        .panel h2 {
+            font-size: 16px;
+            margin: 0;
+            color: #1b3154
+        }
+
+        .panel-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 5px
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px
+        }
+
+        .field {
+            height: 40px;
+            border: 1px solid #d8e0eb;
+            border-radius: 9px;
+            padding: 0 12px;
+            background: white;
+            color: var(--ink);
+            outline: none;
+            min-width: 130px
+        }
+
+        .field:focus,
+        textarea:focus {
+            border-color: #2785d7;
+            box-shadow: 0 0 0 3px #2785d71c
+        }
+
+        .search {
+            flex: 1;
+            min-width: 210px
+        }
+
+        .table-wrap {
+            overflow: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px
+        }
+
+        th {
+            text-align: left;
+            background: #f8fafd;
+            color: #667085;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            padding: 13px 12px;
+            border-bottom: 1px solid var(--line)
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+            vertical-align: middle
+        }
+
+        tbody tr:hover {
+            background: #fbfdff
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0
+        }
+
+        .code {
+            font-weight: 800;
+            color: #1769aa;
+            font-size: 12px
+        }
+
+        .course-name {
+            font-weight: 700;
+            color: #253858
+        }
+
+        .subline {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .status {
+            display: inline-block;
+            border-radius: 99px;
+            padding: 5px 9px;
+            font-size: 11px;
+            font-weight: 750
+        }
+
+        .status.open {
+            background: #e6f7ef;
+            color: #16845b
+        }
+
+        .status.closed {
+            background: #fff1e0;
+            color: #a86608
+        }
+
+        .status.off {
+            background: #f0f1f4;
+            color: #667085
+        }
+
+        .status.registered {
+            background: #eaf3ff;
+            color: #1769aa
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .icon-btn {
+            background: #f4f7fb;
+            color: #52627a;
+            padding: 7px 9px
+        }
+
+        .icon-btn:hover {
+            background: #e8f1fc;
+            color: var(--blue)
+        }
+
+        .btn-sm {
+            font-size: 12px;
+            padding: 8px 10px
+        }
+
+        .empty {
+            text-align: center;
+            padding: 36px;
+            color: var(--muted)
+        }
+
+        .empty b {
+            display: block;
+            color: #344054;
+            margin: 8px
+        }
+
+        .info-banner {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 11px;
+            background: #edf6ff;
+            color: #285d91;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 20px
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px
+        }
+
+        .course-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .course-card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px
+        }
+
+        .course-card h3 {
+            font-size: 14px;
+            margin: 7px 0 4px
+        }
+
+        .course-card p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin: 0
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #52627a
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid var(--line)
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: #0d1b2db8;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            z-index: 30
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: min(560px, 100%);
+            max-height: 92vh;
+            overflow: auto;
+            box-shadow: 0 25px 70px #0003
+        }
+
+        .modal-head {
+            padding: 21px 23px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .modal-head h2 {
+            font-size: 18px;
+            margin: 0
+        }
+
+        .modal-body {
+            padding: 22px 23px
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .form-group.full {
+            grid-column: 1/-1
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 750;
+            color: #344054
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            border: 1px solid #d8e0eb;
+            border-radius: 9px;
+            padding: 10px 11px;
+            outline: none;
+            background: white
+        }
+
+        .form-group textarea {
+            min-height: 82px;
+            resize: vertical
+        }
+
+        .modal-foot {
+            padding: 16px 23px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: flex-end;
+            gap: 9px
+        }
+
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 50;
+            background: #143b62;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 11px;
+            box-shadow: 0 10px 30px #102a5633;
+            font-size: 13px;
+            max-width: 360px;
+            animation: up .2s ease
+        }
+
+        .toast.error {
+            background: #9d3028
+        }
+
+        @keyframes up {
+            from {
+                transform: translateY(8px);
+                opacity: 0
+            }
+
+            to {
+                transform: none;
+                opacity: 1
+            }
+        }
+
+        .login-wrap {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #fff
+        }
+
+        .login-art {
+            background: linear-gradient(145deg, #0d2854, #1769aa);
+            color: white;
+            padding: 8vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        .login-art:after {
+            content: "";
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ffffff22;
+            border-radius: 50%;
+            right: -160px;
+            bottom: -180px;
+            box-shadow: 0 0 0 55px #ffffff08, 0 0 0 110px #ffffff05
+        }
+
+        .login-art h1 {
+            font-size: clamp(30px, 4vw, 52px);
+            line-height: 1.12;
+            max-width: 520px;
+            margin: 28px 0 15px
+        }
+
+        .login-art p {
+            line-height: 1.8;
+            color: #d7e8fb;
+            max-width: 440px
+        }
+
+        .login-art .crest {
+            background: #fff;
+            color: #1769aa
+        }
+
+        .login-points {
+            margin-top: 25px;
+            display: grid;
+            gap: 13px;
+            font-size: 13px;
+            color: #e0edfc
+        }
+
+        .login-form-wrap {
+            display: grid;
+            place-items: center;
+            padding: 30px
+        }
+
+        .login-form {
+            width: min(390px, 100%)
+        }
+
+        .login-form h2 {
+            font-size: 27px;
+            margin: 0 0 8px;
+            color: #142b4d
+        }
+
+        .login-form>p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 28px
+        }
+
+        .login-form .form-group {
+            margin-bottom: 16px
+        }
+
+        .login-form .field {
+            width: 100%;
+            height: 46px
+        }
+
+        .login-form button {
+            width: 100%;
+            height: 46px;
+            margin-top: 7px
+        }
+
+        .demo-box {
+            margin-top: 22px;
+            padding: 14px;
+            background: #f5f8fc;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.8
+        }
+
+        .demo-box b {
+            color: #344054
+        }
+
+        .mobile-menu {
+            display: none
+        }
+
+        .footnote {
+            font-size: 11px;
+            color: #98a2b3;
+            text-align: center;
+            margin-top: 24px
+        }
+
+        @media(max-width:1050px) {
+            .layout {
+                grid-template-columns: 210px 1fr
+            }
+
+            .main {
+                padding: 22px
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .split {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:720px) {
+            .topbar {
+                padding: 0 15px;
+                height: 64px
+            }
+
+            .brand span {
+                display: none
+            }
+
+            .brand strong {
+                font-size: 13px
+            }
+
+            .top-right {
+                gap: 8px
+            }
+
+            .user-meta {
+                display: none
+            }
+
+            .layout {
+                display: block
+            }
+
+            aside {
+                display: none;
+                position: fixed;
+                z-index: 20;
+                top: 64px;
+                bottom: 0;
+                left: 0;
+                width: 255px;
+                box-shadow: 10px 0 30px #0002
+            }
+
+            .layout.menu-open aside {
+                display: block
+            }
+
+            .main {
+                padding: 20px 14px
+            }
+
+            .page-head {
+                flex-direction: column
+            }
+
+            .page-head h1 {
+                font-size: 23px
+            }
+
+            .stats {
+                gap: 9px
+            }
+
+            .stat {
+                padding: 14px
+            }
+
+            .stat .num {
+                font-size: 22px
+            }
+
+            .stat-icon {
+                display: none
+            }
+
+            .course-grid {
+                grid-template-columns: 1fr
+            }
+
+            .panel {
+                padding: 15px
+            }
+
+            .mobile-menu {
+                display: inline-flex
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .form-group.full {
+                grid-column: auto
+            }
+
+            .login-wrap {
+                grid-template-columns: 1fr
+            }
+
+            .login-art {
+                display: none
+            }
+
+            .login-form-wrap {
+                min-height: 100vh;
+                padding: 24px
+            }
+
+            .toolbar .field {
+                flex: 1
+            }
+
+            .toolbar .search {
+                min-width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+const seedCourses = [
+    { code: "IT6040", name: "Phân tích và thiết kế hệ thống", lt: 3, th: 1, desc: "Phương pháp phân tích yêu cầu, mô hình hóa UML và thiết kế hệ thống thông tin.", status: "Đang hoạt động" },
+    { code: "IT6021", name: "Lập trình hướng đối tượng", lt: 3, th: 1, desc: "Các nguyên lý lập trình hướng đối tượng, lớp, kế thừa, đa hình và xử lý ngoại lệ.", status: "Đang hoạt động" },
+    { code: "IT6034", name: "Cơ sở dữ liệu", lt: 3, th: 1, desc: "Mô hình dữ liệu quan hệ, SQL, thiết kế và chuẩn hóa cơ sở dữ liệu.", status: "Đang hoạt động" },
+    { code: "IT6018", name: "Cấu trúc dữ liệu và giải thuật", lt: 3, th: 1, desc: "Cấu trúc dữ liệu cơ bản và các chiến lược thiết kế giải thuật.", status: "Đang hoạt động" },
+    { code: "IT6050", name: "Phát triển ứng dụng Web", lt: 2, th: 2, desc: "Xây dựng giao diện web, xử lý tương tác và kết nối dữ liệu.", status: "Đang hoạt động" },
+    { code: "IT6062", name: "Mạng máy tính", lt: 3, th: 0, desc: "Mô hình mạng, giao thức truyền thông và kiến trúc mạng máy tính.", status: "Đang hoạt động" },
+    { code: "IT6071", name: "Trí tuệ nhân tạo", lt: 3, th: 0, desc: "Tổng quan về tìm kiếm, biểu diễn tri thức và các phương pháp AI.", status: "Đang hoạt động" },
+    { code: "IT6080", name: "Kiểm thử phần mềm", lt: 2, th: 1, desc: "Quy trình, kỹ thuật và công cụ kiểm thử phần mềm.", status: "Ngừng hoạt động" }
+];
+const seedClasses = [
+    { id: "LHP-26001", code: "IT6040", semester: "Học kỳ 1 - 2026/2027", teacher: "ThS. Nguyễn Minh Anh", day: "Thứ 2 · Tiết 1–3", room: "A1-302", max: 60, enrolled: 42, status: "Đang mở" },
+    { id: "LHP-26002", code: "IT6040", semester: "Học kỳ 1 - 2026/2027", teacher: "TS. Trần Quốc Việt", day: "Thứ 4 · Tiết 7–9", room: "A1-405", max: 55, enrolled: 55, status: "Đã đủ" },
+    { id: "LHP-26003", code: "IT6021", semester: "Học kỳ 1 - 2026/2027", teacher: "ThS. Lê Thu Hà", day: "Thứ 3 · Tiết 1–3", room: "B2-201", max: 50, enrolled: 31, status: "Đang mở" },
+    { id: "LHP-26004", code: "IT6034", semester: "Học kỳ 1 - 2026/2027", teacher: "TS. Phạm Đức Long", day: "Thứ 5 · Tiết 4–6", room: "A2-204", max: 45, enrolled: 39, status: "Đang mở" },
+    { id: "LHP-26005", code: "IT6050", semester: "Học kỳ 1 - 2026/2027", teacher: "ThS. Vũ Hoàng Nam", day: "Thứ 6 · Tiết 7–9", room: "Lab C-03", max: 35, enrolled: 22, status: "Đang mở" },
+    { id: "LHP-26006", code: "IT6018", semester: "Học kỳ 1 - 2026/2027", teacher: "ThS. Đỗ Hải Yến", day: "Thứ 4 · Tiết 1–3", room: "B1-305", max: 50, enrolled: 50, status: "Đã đủ" },
+    { id: "LHP-26007", code: "IT6062", semester: "Học kỳ 1 - 2026/2027", teacher: "TS. Nguyễn Thành Công", day: "Thứ 3 · Tiết 7–9", room: "A3-301", max: 55, enrolled: 19, status: "Đang mở" },
+    { id: "LHP-26008", code: "IT6071", semester: "Học kỳ 1 - 2026/2027", teacher: "TS. Bùi Thanh Tùng", day: "Thứ 6 · Tiết 1–3", room: "A2-402", max: 40, enrolled: 18, status: "Đang mở" }
+];
+const DEMO = { 
+    student: { username: "2024607392", password: "123456", role: "student", name: "Bùi Trung Hiếu", id: "2024607392" }, 
+    admin: { username: "admin", password: "admin123", role: "admin", name: "Quản trị viên", id: "ADMIN" } };
+let state = { 
+    user: null, page: "dashboard", courses: [], classes: [], registrations: [], search: "", filter: "all", toast: null, editing: null, modal: null };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const credits = c => Number(c.lt || 0) + Number(c.th || 0);
+const API_BASE = "http://localhost:8080/api/courses";
+let apiConnected = false;
+
+async function syncCoursesFromServer() {
+    try {
+        const res = await fetch(API_BASE);
+        if (res.ok) {
+            state.courses = await res.json();
+            apiConnected = true;
+            save();
+            render();
+        }
+    } catch (err) {
+        apiConnected = false;
+        console.warn("Chưa kết nối được Spring Boot API, đang dùng dữ liệu localStorage dự phòng.");
+    }
+}
+
+function load() {
+    try {
+        state.courses = JSON.parse(localStorage.getItem("haui_courses")) || structuredClone(seedCourses);
+        state.classes = JSON.parse(localStorage.getItem("haui_classes")) || structuredClone(seedClasses);
+        state.registrations = JSON.parse(localStorage.getItem("haui_regs")) || [];
+    } catch (e) {
+        state.courses = structuredClone(seedCourses);
+        state.classes = structuredClone(seedClasses);
+        state.registrations = [];
+    }
+    syncCoursesFromServer();
+}
+function save() { 
+    localStorage.setItem("haui_courses", JSON.stringify(state.courses)); 
+    localStorage.setItem("haui_classes", JSON.stringify(state.classes)); 
+    localStorage.setItem("haui_regs", JSON.stringify(state.registrations)) 
+    }
+function notify(msg, error = false) { 
+    let old = $("#toast"); if (old) old.remove(); 
+    let el = document.createElement("div"); el.id = "toast"; el.className = "toast" + (error ? " error" : ""); el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 3000) }
+function course(code) { 
+    return state.courses.find(c => c.code === code) || { code, name: "Học phần không xác định", lt: 0, th: 0, desc: "", status: "Ngừng hoạt động" } }
+function myRegs() { 
+    return state.registrations.filter(r => r.student === state.user.id && r.status === "Đang hiệu lực") }
+function pageTitle() { 
+    return ({ dashboard: "Tổng quan", catalog: "Tra cứu học phần", myregs: "Kết quả đăng ký", admincourses: "Quản lý học phần" })[state.page] || "Tổng quan" }
+function navItem(page, ico, label) {    
+return `<button class="nav ${state.page === page ? "active" : ""}" data-page="${page}">
+<span class="ico">${ico}</span>${label}</button>`
+}
+function render() {
+        if (!state.user) { renderLogin(); return } const admin = state.user.role === "admin"; $("#root").innerHTML = `<div class="app">
+    <header class="topbar">
+    <div class="brand">
+    <button class="outline mobile-menu" id="menuBtn">☰</button>
+    <div class="crest">HaUI</div>
+        <div>
+            <strong>ĐĂNG KÝ HỌC PHẦN</strong>
+            <span>ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI</span>
+        </div>
+    </div>
+    <div class="top-right">
+        <span class="pill">${admin ? "QUẢN TRỊ VIÊN" : "SINH VIÊN"}</span>
+        <div class="user-meta">
+            <b>${esc(state.user.name)}</b>
+        <span>${esc(state.user.id)}</span>
+        </div>
+        <div class="avatar">${admin ? "QT" : "SV"}</div>
+            <button class="outline btn-sm" id="logout">Đăng xuất</button>
+    </div>
+    </header>
+    <div class="layout" id="layout">
+        <aside>
+            <div class="nav-label">KHÔNG GIAN LÀM VIỆC</div>${navItem("dashboard", "▦", "Tổng quan")}${navItem("catalog", "⌕", "Tra cứu học phần")}${!admin ? navItem("myregs", "☷", "Kết quả đăng ký") : ""}${admin ? `<div class="nav-label">QUẢN TRỊ ĐÀO TẠO</div>${navItem("admincourses", "▤", "Quản lý học phần")}` : ""}<div class="side-note">
+                <b>Hệ thống đăng ký học phần</b>
+            <br>Tra cứu thông tin đào tạo và quản lý đăng ký học phần theo học kỳ.<br>
+            <br>
+            <span class="small">Bản demo học tập · Dữ liệu lưu trên trình duyệt</span>
+            </div>
+        </aside>
+        <main class="main">${renderPage()}</main>
+    </div>
+    </div>`;
+        $("#logout").onclick = () => { state.user = null; state.page = "dashboard"; render() }; $("#menuBtn")?.addEventListener("click", () => $("#layout").classList.toggle("menu-open")); document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => { state.page = b.dataset.page; state.search = ""; render() }); bindPage()
+    }
+function renderLogin() {
+        $("#root").innerHTML = `<div class="login-wrap">
+    <section class="login-art">
+    <div class="brand">
+    <div class="crest">HaUI</div>
+    <div>
+    <strong style="color:white">ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI</strong>
+    <span style="color:#d5e7fb">HANOI UNIVERSITY OF INDUSTRY</span>
+    </div>
+    </div>
+    <h1>Học tập chủ động.<br>Đăng ký dễ dàng.</h1>
+    <p>Hệ thống quản lý đăng ký học phần hỗ trợ sinh viên tra cứu học phần, lựa chọn lớp phù hợp và theo dõi kết quả đăng ký trong một không gian thống nhất.</p>
+    <div class="login-points">
+    <span>✓ Tra cứu học phần và thông tin lớp học</span>
+    <span>✓ Đăng ký lớp học phần trực tuyến</span>
+    <span>✓ Quản lý danh mục học phần theo phân quyền</span>
+    </div>
+    </section>
+    <section class="login-form-wrap">
+    <form class="login-form" id="loginForm">
+    <div class="crumb">CỔNG THÔNG TIN ĐÀO TẠO / ĐĂNG NHẬP</div>
+    <h2>Chào mừng trở lại</h2>
+    <p>Đăng nhập để tiếp tục sử dụng hệ thống.</p>
+    <div class="form-group">
+    <label for="username">Tên đăng nhập / Mã sinh viên</label>
+    <input class="field" id="username" required placeholder="Nhập tên đăng nhập" autocomplete="username">
+    </div>
+    <div class="form-group">
+    <label for="password">Mật khẩu</label>
+    <input class="field" id="password" type="password" required placeholder="Nhập mật khẩu" autocomplete="current-password">
+    </div>
+    <button class="primary" type="submit">Đăng nhập hệ thống →</button>
+    <div class="demo-box">
+    <b>Tài khoản dùng thử</b>
+    <br>Sinh viên: <b>2024607392</b> / <b>123456</b>
+    <br>Quản trị viên: <b>admin</b> / <b>admin123</b>
+    <br>
+    <span class="small">Dữ liệu demo, không phải tài khoản HaUI thật.</span>
+    </div>
+    <div class="footnote">© 2026 · Mô hình hệ thống phục vụ học tập và trình diễn</div>
+    </form>
+    </section>
+    </div>`;
+        $("#loginForm").onsubmit = e => { e.preventDefault(); let u = $("#username").value.trim(), p = $("#password").value; let found = Object.values(DEMO).find(x => x.username === u && x.password === p); if (!found) { notify("Tên đăng nhập hoặc mật khẩu không chính xác.", true); return } state.user = { ...found }; state.page = "dashboard"; render() }
+    }
+function renderPage() { let admin = state.user.role === "admin"; if (state.page === "admincourses" && !admin) state.page = "dashboard"; if (state.page === "myregs" && admin) state.page = "dashboard"; return ({ dashboard: renderDashboard, catalog: renderCatalog, myregs: renderMyRegs, admincourses: renderAdminCourses }[state.page] || renderDashboard)() }
+function stats() { return { courses: state.courses.filter(c => c.status === "Đang hoạt động").length, classes: state.classes.filter(c => c.status === "Đang mở").length, regs: state.user.role === "student" ? myRegs().length : state.registrations.filter(r => r.status === "Đang hiệu lực").length, credits: state.user.role === "student" ? myRegs().reduce((s, r) => s + credits(course(r.code)), 0) : state.courses.reduce((s, c) => s + credits(c), 0) } }
+function statCard(label, num, ico, sub) {    
+    return `<div class="stat">
+    <div>
+    <div class="label">${label}</div>
+    <div class="num">${num}</div>
+    <div class="subline">${sub}</div>
+    </div>
+    <div class="stat-icon">${ico}</div>
+    </div>`}
+function renderDashboard() {    
+    let s = stats(), admin = state.user.role === "admin"; return `<div class="crumb">TRANG CHỦ / TỔNG QUAN</div>
+    <div class="page-head">
+    <div>
+    <h1>Xin chào, ${esc(state.user.name)} 👋</h1>
+    <p>${admin ? "Theo dõi danh mục học phần và quản lý dữ liệu đào tạo." : "Chúc bạn có một học kỳ hiệu quả. Hãy kiểm tra các lớp học phần đang mở."}</p>
+    </div>
+    <span class="pill">● Học kỳ 1 · 2026–2027</span>
+    </div>
+    <div class="stats">${statCard("Học phần hoạt động", s.courses, "▤", "Trong danh mục học phần")}${statCard("Lớp đang mở", s.classes, "▦", "Có thể đăng ký")}${statCard(admin ? "Lượt đăng ký hiệu lực" : "Lớp đã đăng ký", s.regs, "☷", admin ? "Toàn hệ thống" : "Của bạn")}${statCard(admin ? "Tổng tín chỉ danh mục" : "Tổng tín chỉ đã đăng ký", s.credits, "◷", admin ? "Theo danh mục hiện tại" : "Không tính đăng ký đã hủy")}</div>
+    <div class="info-banner">
+    <span>ⓘ</span>
+    <div>
+    <b>Thông tin học kỳ</b>
+    <br>Học kỳ 1 năm học 2026–2027 · Các lớp hiển thị dưới đây là dữ liệu minh họa cho bản demo. Kiểm tra lịch học và sĩ số trước khi đăng ký.</div>
+    </div>
+    <div class="panel">
+    <div class="panel-head">
+    <div>
+    <h2>${admin ? "Danh mục học phần gần đây" : "Lớp học phần đang mở"}</h2>
+    <div class="panel-sub">${admin ? "Quản lý nhanh dữ liệu học phần" : "Chọn lớp phù hợp để xem thông tin và đăng ký"}</div>
+    </div>
+    <button class="outline btn-sm" data-page="${admin ? "admincourses" : "catalog"}">Xem tất cả →</button>
+    </div>${admin ? courseTable(state.courses.slice(0, 5), true) : classTable(state.classes.filter(c => c.status === "Đang mở").slice(0, 5), true)}</div>`
+    }
+function renderCatalog() {    
+    let q = state.search.toLowerCase(); let rows = state.courses.filter(c => (c.code + " " + c.name + " " + c.desc).toLowerCase().includes(q) && (state.filter === "all" || c.status === state.filter)); return `<div class="crumb">SINH VIÊN / TRA CỨU</div>
+    <div class="page-head">
+    <div>
+    <h1>Tra cứu học phần</h1>
+    <p>Tìm kiếm học phần, xem lớp mở và kiểm tra sĩ số trước khi đăng ký.</p>
+    </div>
+    <span class="pill">Học kỳ 1 · 2026–2027</span>
+    </div>
+    <div class="panel">
+    <div class="toolbar">
+    <input id="searchInput" class="field search" placeholder="⌕  Nhập mã hoặc tên học phần..." value="${esc(state.search)}">
+    <select id="filterSelect" class="field">
+    <option value="all">Tất cả trạng thái</option>
+    <option ${state.filter === "Đang hoạt động" ? "selected" : ""}>Đang hoạt động</option>
+    <option ${state.filter === "Ngừng hoạt động" ? "selected" : ""}>Ngừng hoạt động</option>
+    </select>
+    </div>
+    <div class="panel-head">
+    <div>
+    <h2>Danh sách học phần</h2>
+    <div class="panel-sub">Tìm thấy ${rows.length} học phần</div>
+    </div>
+    </div>${rows.length ? `<div class="course-grid">${rows.map(c => {        
+    let classes = state.classes.filter(x => x.code === c.code); return `<article class="course-card">
+    <div class="course-card-top">
+    <div>
+    <span class="code">${esc(c.code)}</span>
+    <h3>${esc(c.name)}</h3>
+    </div>
+    <span class="status ${c.status === "Đang hoạt động" ? "open" : "off"}">${esc(c.status)}</span>
+    </div>
+    <p>${esc(c.desc)}</p>
+    <div class="card-meta">
+    <span>◷ ${credits(c)} tín chỉ</span>
+    <span>▦ ${classes.length} lớp học phần</span>
+    </div>
+    <div class="card-footer">
+    <span class="small muted">LT ${c.lt} · TH ${c.th}</span>
+    <button class="primary btn-sm" data-view="${esc(c.code)}">Xem lớp học →</button>
+    </div>
+    </article>`}).join("")}</div>` : `<div class="empty">⌕<b>Không tìm thấy học phần</b>Thử thay đổi từ khóa hoặc bộ lọc.</div>`}</div>
+    <div id="classesArea">
+    </div>`}
+    function courseTable(rows, admin = false) {    
+    return `<div class="table-wrap">
+    <table>
+    <thead>
+    <tr>
+    <th>Mã học phần</th>
+    <th>Tên học phần</th>
+    <th>Tín chỉ</th>
+    <th>Trạng thái</th>${admin ? '<th>Thao tác</th>' : ""}</tr>
+    </thead>
+    <tbody>${rows.map(c => `<tr>
+    <td class="code">${esc(c.code)}</td>
+    <td>
+    <div class="course-name">${esc(c.name)}</div>
+    <div class="subline">LT ${c.lt} · TH ${c.th}</div>
+    </td>
+    <td>${credits(c)}</td>
+    <td>
+    <span class="status ${c.status === "Đang hoạt động" ? "open" : "off"}">${esc(c.status)}</span>
+    </td>${admin ? `<td>
+    <div class="actions">
+    <button class="icon-btn" data-edit="${esc(c.code)}" title="Sửa">✎</button>
+    <button class="icon-btn" data-delete="${esc(c.code)}" title="Xóa">⌫</button>
+    </div>
+    </td>` : ""}</tr>`).join("")}</tbody>
+    </table>
+    </div>`}
+function classTable(rows, compact = false) {    
+    return `<div class="table-wrap">
+    <table>
+    <thead>
+    <tr>
+    <th>Mã lớp</th>
+    <th>Học phần</th>
+    <th>Giảng viên / lịch</th>
+    <th>Sĩ số</th>
+    <th>Trạng thái</th>
+    <th>
+    </th>
+    </tr>
+    </thead>
+    <tbody>${rows.map(cl => {        
+    let c = course(cl.code), registered = myRegs().some(r => r.classId === cl.id); return `<tr>
+    <td class="code">${esc(cl.id)}</td>
+    <td>
+    <div class="course-name">${esc(c.name)}</div>
+    <div class="subline">${esc(cl.code)} · ${credits(c)} tín chỉ</div>
+    </td>
+    <td>${esc(cl.teacher)}<div class="subline">${esc(cl.day)} · ${esc(cl.room)}</div>
+    </td>
+    <td>${cl.enrolled}/${cl.max}<div class="subline">Còn ${Math.max(0, cl.max - cl.enrolled)} chỗ</div>
+    </td>
+    <td>
+    <span class="status ${cl.status === "Đang mở" ? "open" : "closed"}">${esc(cl.status)}</span>
+    </td>
+    <td>${state.user.role === "student" ? registered ? '<span class="status registered">Đã đăng ký</span>' : `<button class="primary btn-sm" data-register="${esc(cl.id)}" ${cl.status !== "Đang mở" || cl.enrolled >= cl.max ? "disabled" : ""}>Đăng ký</button>` : `<button class="outline btn-sm" data-detail="${esc(cl.id)}">Chi tiết</button>`}</td>
+    </tr>`}).join("")}</tbody>
+    </table>
+    </div>`}
+function renderAdminCourses() {    
+        let q = state.search.toLowerCase(); let rows = state.courses.filter(c => (c.code + " " + c.name).toLowerCase().includes(q)); return `<div class="crumb">QUẢN TRỊ ĐÀO TẠO / HỌC PHẦN</div>
+        <div class="page-head">
+        <div>
+        <h1>Quản lý học phần</h1>
+        <p>Xem, thêm, chỉnh sửa và cập nhật trạng thái học phần trong danh mục.</p>
+        </div>
+        <button class="primary" id="addCourse">＋ Thêm học phần</button>
+        </div>
+        <div class="stats">${statCard("Tổng học phần", state.courses.length, "▤", "Trong danh mục")}${statCard("Đang hoạt động", state.courses.filter(c => c.status === "Đang hoạt động").length, "✓", "Có thể mở lớp")}${statCard("Ngừng hoạt động", state.courses.filter(c => c.status !== "Đang hoạt động").length, "Ⅱ", "Không mở đăng ký")}${statCard("Tổng tín chỉ", state.courses.reduce((a, c) => a + credits(c), 0), "◷", "LT + TH")}</div>
+        <div class="panel">
+        <div class="toolbar">
+        <input class="field search" id="searchInput" placeholder="⌕  Tìm theo mã hoặc tên học phần..." value="${esc(state.search)}">
+        <button class="outline" id="resetDemo">Khôi phục dữ liệu mẫu</button>
+        </div>
+        <div class="panel-head">
+        <div>
+        <h2>Danh mục học phần</h2>
+        <div class="panel-sub">Có ${rows.length} bản ghi phù hợp · Xóa học phần sẽ bị chặn nếu đã có lớp học phần liên kết</div>
+        </div>
+        <span class="pill">${rows.length} kết quả</span>
+        </div>${rows.length ? courseTable(rows, true) : '<div class="empty">Không có học phần phù hợp.</div>'}</div>`
+        }
+function renderMyRegs() {    
+    let regs = state.registrations.filter(r => r.student === state.user.id); let active = regs.filter(r => r.status === "Đang hiệu lực"); return `<div class="crumb">SINH VIÊN / KẾT QUẢ ĐĂNG KÝ</div>
+    <div class="page-head">
+    <div>
+    <h1>Kết quả đăng ký</h1>
+    <p>Theo dõi các lớp đã đăng ký và trạng thái đăng ký của bạn.</p>
+    </div>
+    <span class="pill">Học kỳ 1 · 2026–2027</span>
+    </div>
+    <div class="stats">${statCard("Lớp đang hiệu lực", active.length, "☷", "Đã ghi nhận")}${statCard("Tổng tín chỉ", active.reduce((a, r) => a + credits(course(r.code)), 0), "◷", "Theo lớp còn hiệu lực")}${statCard("Đã hủy", regs.filter(r => r.status === "Đã hủy").length, "↶", "Lịch sử hủy")}${statCard("Số học phần", new Set(active.map(r => r.code)).size, "▤", "Không tính lớp đã hủy")}</div>
+    <div class="panel">
+    <div class="panel-head">
+    <div>
+    <h2>Danh sách đăng ký của tôi</h2>
+    <div class="panel-sub">Bản demo cho phép hủy lớp đang có trạng thái hiệu lực.</div>
+    </div>
+    <button class="outline btn-sm" data-page="catalog">＋ Đăng ký thêm</button>
+    </div>${regs.length ? `<div class="table-wrap">
+    <table>
+    <thead>
+    <tr>
+    <th>Mã lớp</th>
+    <th>Học phần</th>
+    <th>Tín chỉ</th>
+    <th>Ngày đăng ký</th>
+    <th>Trạng thái</th>
+    <th>
+    </th>
+    </tr>
+    </thead>
+    <tbody>${regs.slice().reverse().map(r => `<tr>
+    <td class="code">${esc(r.classId)}</td>
+    <td>
+    <div class="course-name">${esc(course(r.code).name)}</div>
+    <div class="subline">${esc(r.code)}</div>
+    </td>
+    <td>${credits(course(r.code))}</td>
+    <td>${new Date(r.time).toLocaleString("vi-VN")}</td>
+    <td>
+    <span class="status ${r.status === "Đang hiệu lực" ? "open" : "off"}">${esc(r.status)}</span>
+    </td>
+    <td>${r.status === "Đang hiệu lực" ? `<button class="danger btn-sm" data-cancel="${esc(r.id)}">Hủy đăng ký</button>` : "—"}</td>
+    </tr>`).join("")}</tbody>
+    </table>
+    </div>` : '<div class="empty">☷<b>Bạn chưa đăng ký học phần nào</b>Truy cập Tra cứu học phần để chọn lớp phù hợp.</div>'}</div>`
+    }
+function bindPage() { if (state.page === "catalog") { let i = $("#searchInput"), f = $("#filterSelect"); i.oninput = () => { state.search = i.value; let pos = i.selectionStart; render(); $("#searchInput").focus(); $("#searchInput").setSelectionRange(pos, pos) }; f.onchange = () => { state.filter = f.value; render() }; document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => showClasses(b.dataset.view)); document.querySelectorAll("[data-register]").forEach(b => b.onclick = () => registerClass(b.dataset.register)) } if (state.page === "admincourses") { let i = $("#searchInput"); i.oninput = () => { state.search = i.value; let pos = i.selectionStart; render(); $("#searchInput").focus(); $("#searchInput").setSelectionRange(pos, pos) }; $("#addCourse").onclick = () => openCourseModal(); $("#resetDemo").onclick = () => { if (confirm("Khôi phục danh mục và lớp học phần về dữ liệu mẫu? Các thay đổi demo sẽ bị mất.")) { state.courses = structuredClone(seedCourses); state.classes = structuredClone(seedClasses); state.registrations = []; save(); render(); notify("Đã khôi phục dữ liệu mẫu.") } }; document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openCourseModal(b.dataset.edit)); document.querySelectorAll("[data-delete]").forEach(b => b.onclick = () => deleteCourse(b.dataset.delete)) } document.querySelectorAll("[data-cancel]").forEach(b => b.onclick = () => cancelReg(b.dataset.cancel)); document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => { state.page = b.dataset.page; render() }) }
+function showClasses(code) {    
+    let c = course(code), cl = state.classes.filter(x => x.code === code); let area = $("#classesArea"); area.innerHTML = `<div class="panel" id="classPanel">
+    <div class="panel-head">
+    <div>
+    <h2>${esc(c.name)} · Danh sách lớp học phần</h2>
+    <div class="panel-sub">${esc(code)} · ${credits(c)} tín chỉ</div>
+    </div>
+    <button class="outline btn-sm" id="closeClasses">Đóng</button>
+    </div>${cl.length ? classTable(cl) : '<div class="empty">Học phần chưa có lớp được mở.</div>'}</div>`; $("#closeClasses").onclick = () => area.innerHTML = ""; area.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll("[data-register]").forEach(b => b.onclick = () => registerClass(b.dataset.register))
+    }
+    function registerClass(id) { let cl = state.classes.find(c => c.id === id); if (!cl || cl.status !== "Đang mở" || cl.enrolled >= cl.max) { notify("Lớp đã đóng hoặc đã đủ sĩ số.", true); return } if (myRegs().some(r => r.classId === id)) { notify("Bạn đã đăng ký lớp học phần này.", true); return } let c = course(cl.code); if (c.status !== "Đang hoạt động") { notify("Học phần đã ngừng hoạt động.", true); return } if (myRegs().some(r => { let other = state.classes.find(x => x.id === r.classId); return other && other.code === cl.code })) { notify("Bạn đã đăng ký một lớp của học phần này.", true); return } if (!confirm(`Xác nhận đăng ký ${cl.id} – ${c.name}?`)) return; state.registrations.push({ id: "DK-" + Date.now(), student: state.user.id, classId: id, code: cl.code, time: new Date().toISOString(), status: "Đang hiệu lực" }); cl.enrolled++; save(); notify("Đăng ký học phần thành công!"); render() }
+    function cancelReg(id) { let r = state.registrations.find(x => x.id === id); if (!r || r.status !== "Đang hiệu lực") return; if (!confirm("Bạn chắc chắn muốn hủy đăng ký lớp này?")) return; r.status = "Đã hủy"; r.cancelTime = new Date().toISOString(); let cl = state.classes.find(c => c.id === r.classId); if (cl) cl.enrolled = Math.max(0, cl.enrolled - 1); save(); render(); notify("Đã hủy đăng ký học phần.") }
+    function openCourseModal(code) {    
+    let c = code ? state.courses.find(x => x.code === code) : null; $("#modalRoot")?.remove(); let root = document.createElement("div"); root.id = "modalRoot"; root.className = "modal-backdrop"; root.innerHTML = `<div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+    <h2>${c ? "Chỉnh sửa học phần" : "Thêm học phần mới"}</h2>
+    <button class="icon-btn" id="xModal">✕</button>
+    </div>
+    <form id="courseForm">
+    <div class="modal-body">
+    <div class="form-grid">
+    <div class="form-group">
+    <label for="cCode">Mã học phần *</label>
+    <input id="cCode" required maxlength="20" ${c ? 'readonly' : ''} value="${esc(c?.code || "")}" placeholder="VD: IT6090">
+    </div>
+    <div class="form-group">
+    <label for="cStatus">Trạng thái</label>
+    <select id="cStatus">
+    <option ${!c || c.status === "Đang hoạt động" ? "selected" : ""}>Đang hoạt động</option>
+    <option ${c?.status === "Ngừng hoạt động" ? "selected" : ""}>Ngừng hoạt động</option>
+    </select>
+    </div>
+    <div class="form-group full">
+    <label for="cName">Tên học phần *</label>
+    <input id="cName" required maxlength="150" value="${esc(c?.name || "")}" placeholder="Nhập tên học phần">
+    </div>
+    <div class="form-group">
+    <label for="cLt">Tín chỉ lý thuyết *</label>
+    <input id="cLt" type="number" min="0" max="20" required value="${c?.lt ?? 3}">
+    </div>
+    <div class="form-group">
+    <label for="cTh">Tín chỉ thực hành *</label>
+    <input id="cTh" type="number" min="0" max="20" required value="${c?.th ?? 0}">
+    </div>
+    <div class="form-group full">
+    <label for="cDesc">Mô tả</label>
+    <textarea id="cDesc" maxlength="500" placeholder="Mô tả ngắn về học phần">${esc(c?.desc || "")}</textarea>
+    </div>
+    </div>
+    <p class="small muted">Mã học phần phải duy nhất. Tổng tín chỉ bằng tín chỉ lý thuyết cộng tín chỉ thực hành.</p>
+    </div>
+    <div class="modal-foot">
+    <button type="button" class="outline" id="cancelModal">Hủy</button>
+    <button class="primary" type="submit">Lưu học phần</button>
+    </div>
+    </form>
+    </div>`; document.body.appendChild(root); const close = () => root.remove(); $("#xModal").onclick = close; $("#cancelModal").onclick = close; root.onclick = e => { if (e.target === root) close() }; $("#courseForm").onsubmit = async e => {
+        e.preventDefault();
+        let item = {
+            code: $("#cCode").value.trim().toUpperCase(),
+            name: $("#cName").value.trim(),
+            lt: Number($("#cLt").value),
+            th: Number($("#cTh").value),
+            desc: $("#cDesc").value.trim(),
+            status: $("#cStatus").value
+        };
+        if (item.lt + item.th <= 0) { notify("Tổng số tín chỉ phải lớn hơn 0.", true); return; }
+
+        try {
+            const url = c ? `${API_BASE}/${encodeURIComponent(c.code)}` : API_BASE;
+            const method = c ? "PUT" : "POST";
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(item)
+            });
+            if (res.ok) {
+                await syncCoursesFromServer();
+                close();
+                notify(c ? "Đã cập nhật học phần vào SQL Server!" : "Đã thêm học phần mới vào SQL Server!");
+                return;
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                notify(errData.message || "Lỗi khi lưu dữ liệu vào CSDL.", true);
+                return;
+            }
+        } catch (err) {
+            // Fallback localStorage nếu chưa bật Backend
+            if (!c && state.courses.some(x => x.code.toLowerCase() === item.code.toLowerCase())) {
+                notify("Mã học phần đã tồn tại.", true);
+                return;
+            }
+            if (c) { Object.assign(c, item); } else { state.courses.push(item); }
+            save(); close(); render();
+            notify(c ? "Đã cập nhật học phần (Local)." : "Đã thêm học phần mới (Local).");
+        }
+    }
+}
+async function deleteCourse(code) {
+    let linked = state.classes.some(c => c.code === code);
+    if (linked) {
+        notify("Không thể xóa: học phần đang có lớp học phần liên kết. Hãy chuyển trạng thái sang Ngừng hoạt động.", true);
+        return;
+    }
+    if (!confirm(`Xóa học phần ${code}? Thao tác này không thể hoàn tác.`)) return;
+    try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(code)}`, { method: "DELETE" });
+        if (res.ok) {
+            await syncCoursesFromServer();
+            notify("Đã xóa học phần khỏi SQL Server.");
+            return;
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            notify(errData.message || "Không thể xóa học phần.", true);
+            return;
+        }
+    } catch (err) {
+        state.courses = state.courses.filter(c => c.code !== code);
+        save(); render();
+        notify("Đã xóa học phần (Local).");
+    }
+}
+load(); render();
+    </script>
+</body>
+
+</html>
